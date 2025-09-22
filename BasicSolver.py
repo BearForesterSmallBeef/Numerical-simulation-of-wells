@@ -45,7 +45,23 @@ class QuantumWellSolver:
             norm = np.sqrt(np.sum(self.eigenvectors[:, i] ** 2) * self.dz)
             self.eigenvectors[:, i] /= norm
 
-        print([f"E_{i} = {E}" for i, E in enumerate(self.eigenvalues)], sep=";\t")
+    def get_energy(self, printing=True) -> np.ndarray:
+        if self.eigenvalues is None:
+            print("Ничо не посчитано")
+            return np.array([])
+        if printing:
+            print([f"E_{i} = {E}" for i, E in enumerate(self.eigenvalues)], sep=";\t")
+        return self.eigenvalues
+
+    def get_functions(self, printing=True) -> np.ndarray:
+        from pprint import pprint
+
+        if self.eigenvectors is None:
+            print("Ничо не посчитано")
+            return np.array([])
+        if printing:
+            pprint(self.eigenvectors)
+        return self.eigenvectors
 
     def plot_potential(self, path="results/pivo_pot.png"):
         fig, axs = plt.subplots()
@@ -89,16 +105,16 @@ class QuantumWellSolver:
                  }
         c = ["r", "g", "b", "black", "yellow"]
 
-        plt.plot(self.z, self.potential, color='black', label='$U(z)$', lw=2)
+        plt.plot(self.z, self.potential, color='black', label='$U(z)$')
 
         num_levels = min(num_levels_to_plot, len(self.eigenvalues))
 
         for i in range(num_levels):
-            plt.plot(self.z, self.eigenvalues[i] + self.eigenvectors[:, i], label=f"E_{i}={round(self.eigenvalues[i], 2)}")
-            plt.axhline(self.eigenvalues[i], color="gray", linestyle='--')
+            axs.plot(self.z, self.eigenvalues[i] + self.eigenvectors[:, i], label=f"E_{i}={round(self.eigenvalues[i], 2)}")
+            axs.axhline(self.eigenvalues[i], color="gray", linestyle='--')
 
         plt.title("Собственные функции и уровни энергии")
         plt.xlabel(r"$z$")
-        plt.ylabel(r"$\psi(z)$")
+        plt.ylabel(r"$\psi(z),~\frac{hw}{2}$")
         plt.legend()
         plt.savefig(path)
